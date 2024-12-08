@@ -23,4 +23,4 @@ jobs:
             mkdir build
             cmake -Bbuild -G "Unix Makefiles"       
             cmake --build build
-            ./build/bin/test_stack_and_queue
+            ./build/bin/test_translator
