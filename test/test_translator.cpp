@@ -18,7 +18,6 @@ TEST(translator, analisys_is_false) {
 TEST(translator, analisys_is_true) {
 	translator t("1+2-(3*8)");
 	t.sintaksis_analysis();
-	t.sort_term();
 	EXPECT_EQ(t.analisys(), true);
 };
 TEST(translator, checking_brackets_is_false) {
