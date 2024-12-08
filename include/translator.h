@@ -359,7 +359,7 @@ public:
         return 1;
     };
     void sort_term() {              //Перевод в обратную польскую запись
-        stack<Term*> stack;
+        Mstack<Term*> stack;
         for (int i = 0; i < terms.size(); i++) {
             if (terms[i]->get_type() == numbers)
                 sort_terms.push_back(terms[i]);
@@ -367,7 +367,7 @@ public:
                 if (stack.empty()) 
                     stack.push(terms[i]);
                 else {
-                    while (!stack.empty() && (((Operation*)(stack.top()))->get_priority() >= ((Operation*)(terms[i]))->get_priority())) {
+                    while ((((Operation*)(stack.top()))->get_priority() >= ((Operation*)(terms[i]))->get_priority())) {
                         sort_terms.push_back(stack.top());
                         stack.pop();
                         if (stack.empty()) break;
