@@ -33,7 +33,8 @@ TEST(translator, throw_computing) {
 	ASSERT_ANY_THROW(t.translation());
 }
 TEST(translator, translation_1) {
-	translator t("1+5/(2-12)");
+	string st = "1+5/(2-12)";
+	translator t(st);
 	EXPECT_EQ(t.translation(), 0.5);
 }
 TEST(translator, translation_2) {
