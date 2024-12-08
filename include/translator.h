@@ -419,8 +419,8 @@ public:
 
     double translation() {              //Итоговая функция вычисления ариф. выражения
         sintaksis_analysis();
-	if (!analisys() || !checking_brackets())
-		throw ("syntax_error");
+	    if (!analisys() || !checking_brackets())
+		    throw ("syntax_error");
         sort_term();
         return computing();
     }
