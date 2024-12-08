@@ -2,8 +2,6 @@
 // 
 // Носков И.А.
 
-//#ifndef __TRANSLATOR_H__
-//#define __TRANSLATOR_H__
 
 #include <iostream>
 #include <cstdlib>
@@ -22,7 +20,7 @@ public:
     {
         pMem = new T[capacity];     // Выделяем память 2 * sz + 1
         if (pMem == nullptr)        // Проверка выделения памяти
-            throw ("failed_to_allocate_memory");
+            throw runtime_error("failed_to_allocate_memory");
     }
     Mvector(T* arr, size_t size) : sz(size), capacity(2 * size + 1)
     {
@@ -257,9 +255,9 @@ public:
         for (int i = 0; i < expression.size(); i++) {
             if (number_status == 0) {
                 if (expression[i] == '(' || expression[i] == '{' || expression[i] == '[')
-                    terms.push_back(new Open_Bracket());
+                    terms.push_back(new Open_Bracket);
                 if (expression[i] == ')' || expression[i] == '}' || expression[i] == ']')
-                    terms.push_back(new Close_Bracket());
+                    terms.push_back(new Close_Bracket);
                 if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/')
                     terms.push_back(new Operation(expression[i]));
                 if (expression[i] == '0' || expression[i] == '1' || expression[i] == '2' || expression[i] == '3' || expression[i] == '4' || expression[i] == '5' || expression[i] == '6' || expression[i] == '7' || expression[i] == '8' || expression[i] == '9') {
@@ -273,7 +271,7 @@ public:
                 if (expression[i] == ')' || expression[i] == '}' || expression[i] == ']') {
                     number_status = 0;
                     terms.push_back(new Number(stod(n)));
-                    terms.push_back(new Close_Bracket());
+                    terms.push_back(new Close_Bracket);
                     n.clear();
                 }
                 if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
