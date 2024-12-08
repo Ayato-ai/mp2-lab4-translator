@@ -6,6 +6,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <stack>
 using namespace std;
 
 //Вектор
@@ -358,7 +359,7 @@ public:
         return 1;
     };
     void sort_term() {              //Перевод в обратную польскую запись
-        Mstack<Term*> stack;
+        stack<Term*> stack;
         for (int i = 0; i < terms.size(); i++) {
             if (terms[i]->get_type() == numbers)
                 sort_terms.push_back(terms[i]);
