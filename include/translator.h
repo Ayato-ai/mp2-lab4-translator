@@ -363,12 +363,15 @@ public:
             if (terms[i]->get_type() == numbers)
                 sort_terms.push_back(terms[i]);
             if (terms[i]->get_type() == operation) {
-                if (!stack.empty()) 
+                if (stack.empty()) 
+                    stack.push(terms[i]);
+                else {
                     while (!stack.empty() && (((Operation*)(stack.top()))->get_priority() >= ((Operation*)(terms[i]))->get_priority())) {
                         sort_terms.push_back(stack.top());
                         stack.pop();
                     }
-                stack.push(terms[i]);
+                    stack.push(terms[i]);
+                }
             }
             if (terms[i]->get_type() == open_bracket) {
                 stack.push(terms[i]);
