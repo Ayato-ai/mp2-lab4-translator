@@ -72,3 +72,7 @@ TEST(translator, translation_9) {
 	translator t("(5*4+7)/3+5*7");
 	EXPECT_EQ(t.translation(), 44);
 };
+TEST(translator, div_null) {
+	translator t("5/(3-3)");
+	ASSERT_ANY_THROW(t.translation());
+};
