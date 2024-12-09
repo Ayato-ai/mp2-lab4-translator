@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <string>
 #include <stack>
+#include <vector>
 using namespace std;
 
 //Вектор
@@ -246,8 +247,8 @@ public:
 class translator {
 private:
     string expression;          //Строка выражение 
-    Mvector<Term*> terms;       //Вектор лексем
-    Mvector<Term*> sort_terms;  //Вектор лексем в обратной польской записи
+    vector<Term*> terms;       //Вектор лексем
+    vector<Term*> sort_terms;  //Вектор лексем в обратной польской записи
 public:
     translator(string str) : expression(str) {};
     void sintaksis_analysis() {         //Перевод строки в набор лексем
@@ -331,7 +332,7 @@ public:
         return true;
     };
     bool checking_brackets() const{             //Проверка скобок
-        Mstack<char> stack;
+        stack<char> stack;
         for (int i = 0; i < expression.length(); i++) {
             if ((expression[i] == '(') || (expression[i] == '[') || (expression[i] == '{'))
                 stack.push(expression[i]);
@@ -359,7 +360,7 @@ public:
         return 1;
     };
     void sort_term() {              //Перевод в обратную польскую запись
-        Mstack<Term*> stack;
+        stack<Term*> stack;
         for (int i = 0; i < terms.size(); i++) {
             if (terms[i]->get_type() == numbers)
                 sort_terms.push_back(terms[i]);
@@ -392,7 +393,7 @@ public:
         }
     };
     double computing() {            //Вычисление выражения 
-        Mstack<Term*> stack;
+        stack<Term*> stack;
         double left_op, right_op;
         for (int i = 0; i < sort_terms.size(); i++) {
             if (sort_terms[i]->get_type() == numbers)
@@ -415,7 +416,7 @@ public:
                         throw ("div_on_zero");
             }
         }
-        return ((Number*)stack[0])->get_value();
+        return ((Number*)stack.top())->get_value();
     };
 
 
