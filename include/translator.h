@@ -368,7 +368,7 @@ public:
                 if (stack.empty()) 
                     stack.push(terms[i]);
                 else {
-                    while (!stack.empty() && (((Operation*)(stack.top()))->get_priority() >= ((Operation*)(terms[i]))->get_priority())) {
+                    while (!stack.empty() && (stack.top()->get_type() == operation) && (((Operation*)(stack.top()))->get_priority() >= ((Operation*)(terms[i]))->get_priority())) {
                         sort_terms.push_back(stack.top());
                         stack.pop();
                     }
