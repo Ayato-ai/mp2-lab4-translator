@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include "conio.h"
 #include "translator.h"
 using namespace std;
 
@@ -16,6 +17,6 @@ int main() {
 	catch (const invalid_argument& error) {
 		cerr << "Ошибка: " << error.what() << endl;
 	}
-	g = _getch();
+	g = getch();
 	cout << g;
 }
