@@ -6,19 +6,19 @@
 TEST(translator, can_translator) {
 	ASSERT_NO_THROW(translator t("1+5/(2-12)"));
 };
-TEST(translator, throw_sintaksis_analysis) {
+TEST(translator, throw_lexical_analysis) {
 	translator t("1+2+3(");
-	ASSERT_ANY_THROW(t.sintaksis_analysis());
+	ASSERT_ANY_THROW(t.lexical_analysis());
 };
 TEST(translator, analisys_is_false) {
 	translator t("1+2-/52");
-	t.sintaksis_analysis();
-	EXPECT_EQ(t.analisys(), false);
+	t.lexical_analysis();
+	EXPECT_EQ(t.sintaksis_analisys(), false);
 };
 TEST(translator, analisys_is_true) {
 	translator t("1+2-(3*8)");
-	t.sintaksis_analysis();
-	EXPECT_EQ(t.analisys(), true);
+	t.lexical_analysis();
+	EXPECT_EQ(t.sintaksis_analisys(), true);
 };
 TEST(translator, checking_brackets_is_false) {
 	translator t("1+(2-5))");

@@ -249,10 +249,10 @@ private:
     Mvector<Term*> sort_terms;  //Вектор лексем в обратной польской записи
 public:
     translator(string str) : expression(str) {};
-    void sintaksis_analysis() {         //Перевод строки в набор лексем
-        int number_status = 0;
-        string n;
-        for (int i = 0; i < expression.size(); i++) {
+    void lexical_analysis() {         //Перевод строки в набор лексем
+        int number_status = 0;          //Флаг для накопления числа
+        string n;                       //Строка для накопления числа
+        for (size_t i = 0; i < expression.size(); i++) {
             if (number_status == 0) {
                 if (expression[i] == '(' || expression[i] == '{' || expression[i] == '[')
                     terms.push_back(new Open_Bracket);
@@ -281,47 +281,39 @@ public:
                     n.clear();
                 }
                 if (expression[i] == '(' || expression[i] == '{' || expression[i] == '[')
-                    throw ("sintax error");
+                    throw invalid_argument("Неверный синтаксис"); //Ошибка синтаксиса 
             }
         }
-        if(number_status)
+        if(number_status)           //Если осталось накопленное число, добавляем
             terms.push_back(new Number(stod(n)));
     };
-    bool analisys() const {             //Анализ лексем на конечном автомате 
-        types pos = nun;
+    bool sintaksis_analisys() const {             //Анализ лексем на конечном автомате 
+        types pos = nun;                //Сохраняем тип лексемы
         if (terms[0]->get_type() == operation)
-            return 0;
+            return 0;                   //Первой лексемой не может быть операнд
         if (terms[0]->get_type() == numbers)
             pos = numbers;
         if (terms[0]->get_type() == open_bracket)
             pos = open_bracket;
         if (terms[0]->get_type() == close_bracket)
-            return 0;
-        for (int i = 1; i < terms.size(); i++) {
+            return 0;                   //Первой лексемой не может быть закрывающая скобка
+        for (size_t i = 1; i < terms.size(); i++) {
             switch (terms[i]->get_type()) {
             case operation:
-                if (pos == operation || pos == open_bracket)
-                    return 0;
-                else
-                    pos = operation;
+                if (pos == operation || pos == open_bracket) return 0;
+                else pos = operation;
                 break;
             case numbers:
-                if (pos == numbers || pos == close_bracket)
-                    return 0;
-                else
-                    pos = numbers;
+                if (pos == numbers || pos == close_bracket) return 0;
+                else pos = numbers;
                 break;
             case open_bracket:
-                if (pos == numbers || pos == close_bracket)
-                    return 0;
-                else
-                    pos = open_bracket;
+                if (pos == numbers || pos == close_bracket) return 0;
+                else pos = open_bracket;
                 break;
             case close_bracket:
-                if (pos == operation || pos == open_bracket)
-                    return 0;
-                else
-                    pos = close_bracket;
+                if (pos == operation || pos == open_bracket) return 0;
+                else pos = close_bracket;
                 break;
             default:
                 break;
@@ -330,8 +322,8 @@ public:
         return true;
     };
     bool checking_brackets() const{             //Проверка скобок
-        Mstack<char> stack;
-        for (int i = 0; i < expression.length(); i++) {
+        Mstack<char> stack;                     //Сохраняем скобки в стек
+        for (size_t i = 0; i < expression.length(); i++) {
             if ((expression[i] == '(') || (expression[i] == '[') || (expression[i] == '{'))
                 stack.push(expression[i]);
 
@@ -354,18 +346,18 @@ public:
                 stack.pop();
             }
         }
-        if (stack.size()) return 0;
+        if (stack.size()) return 0;     //Не для каждой скобки есть пара
         return 1;
     };
     void sort_term() {              //Перевод в обратную польскую запись
-        Mstack<Term*> stack;
-        for (int i = 0; i < terms.size(); i++) {
+        Mstack<Term*> stack;        //Стек для хранения операций
+        for (size_t i = 0; i < terms.size(); i++) {
             if (terms[i]->get_type() == numbers)
                 sort_terms.push_back(terms[i]);
             if (terms[i]->get_type() == operation) {
                 if (stack.empty()) 
                     stack.push(terms[i]);
-                else {
+                else {              //Пока приоритет новой операции меньше или равен, пишем в вектор
                     while (!stack.empty() && (stack.top()->get_type() == operation) && (((Operation*)(stack.top()))->get_priority() >= ((Operation*)(terms[i]))->get_priority())) {
                         sort_terms.push_back(stack.top());
                         stack.pop();
@@ -384,15 +376,15 @@ public:
                 stack.pop();
             }
         }
-        while (!stack.empty()) {
+        while (!stack.empty()) {        //Добавляем отсавшиеся операции
             sort_terms.push_back(stack.top());
             stack.pop();
         }
     };
     double computing() {            //Вычисление выражения 
-        Mstack<Term*> stack;
-        double left_op, right_op;
-        for (int i = 0; i < sort_terms.size(); i++) {
+        Mstack<Term*> stack;        //Стек для хранения лексем
+        double left_op, right_op;   //Левый и правый операнды
+        for (size_t i = 0; i < sort_terms.size(); i++) {
             if (sort_terms[i]->get_type() == numbers)
                 stack.push(sort_terms[i]);
             if (sort_terms[i]->get_type() == operation) {
@@ -409,24 +401,24 @@ public:
                 if (((Operation*)sort_terms[i])->get_operation() == '/')
                     if (right_op != 0)
                         stack.push(new Number(left_op / right_op));
-                    else
-                        throw ("div_on_zero");
+                    else                    //Проверка деления на ноль
+                        throw invalid_argument("Деление на ноль!");
             }
         }
-        return ((Number*)stack.top())->get_value();
+        return ((Number*)stack.top())->get_value(); //Возвращаем ответ
     };
 
 
     double translation() {              //Итоговая функция вычисления ариф. выражения
-        sintaksis_analysis();
-	    if (!analisys() || !checking_brackets())
-		    throw ("syntax_error");
+        lexical_analysis();
+        if (!sintaksis_analisys() || !checking_brackets())
+            throw invalid_argument("Неверный синтаксис"); //Ошибка синтаксиса
         sort_term();
         return computing();
-    }
+    };
     ~translator() {
-        int size_terms = terms.size();
-        for (int i = 0; i < size_terms; i++)
+        size_t size_terms = terms.size();
+        for (size_t i = 0; i < size_terms; i++)
             delete terms[i];
     };
 };
