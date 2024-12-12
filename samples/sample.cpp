@@ -1,5 +1,4 @@
 ﻿#include <iostream>
-#include <conio.h>
 #include "translator.h"
 using namespace std;
 
