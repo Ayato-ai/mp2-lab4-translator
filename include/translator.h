@@ -231,14 +231,14 @@ class Open_Bracket : public Term {
 private:
     char bracket;
 public:
-    Open_Bracket(): Term(open_bracket), bracket('(') {};
+    Open_Bracket(char br): Term(open_bracket), bracket(br) {};
 };
 //Класс закрывающая скобка
 class Close_Bracket : public Term {
 private:
     char bracket;
 public:
-    Close_Bracket(): Term(close_bracket), bracket(')') {};
+    Close_Bracket(char br): Term(close_bracket), bracket(br) {};
 };
 
 //Класс транслятор 
@@ -249,29 +249,29 @@ private:
     Mvector<Term*> sort_terms;  //Вектор лексем в обратной польской записи
 public:
     translator(string str) : expression(str) {};
-    void lexical_analysis() {         //Перевод строки в набор лексем
+    void lexical_analysis() {           //Перевод строки в набор лексем
         int number_status = 0;          //Флаг для накопления числа
         string n;                       //Строка для накопления числа
         for (size_t i = 0; i < expression.size(); i++) {
             if (number_status == 0) {
                 if (expression[i] == '(' || expression[i] == '{' || expression[i] == '[')
-                    terms.push_back(new Open_Bracket);
+                    terms.push_back(new Open_Bracket(expression[i]));
                 if (expression[i] == ')' || expression[i] == '}' || expression[i] == ']')
-                    terms.push_back(new Close_Bracket);
+                    terms.push_back(new Close_Bracket(expression[i]));
                 if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/')
                     terms.push_back(new Operation(expression[i]));
-                if (expression[i] == '0' || expression[i] == '1' || expression[i] == '2' || expression[i] == '3' || expression[i] == '4' || expression[i] == '5' || expression[i] == '6' || expression[i] == '7' || expression[i] == '8' || expression[i] == '9') {
+                if (expression[i] >= '0' && expression[i] <= '9') {
                     number_status++;
                     n += expression[i];
                 }
             }
             else {
-                if (expression[i] == '.' || expression[i] == '0' || expression[i] == '1' || expression[i] == '2' || expression[i] == '3' || expression[i] == '4' || expression[i] == '5' || expression[i] == '6' || expression[i] == '7' || expression[i] == '8' || expression[i] == '9')
+                if (expression[i] == '.' || (expression[i] >= '0' && expression[i] <= '9'))
                     n += expression[i];
                 if (expression[i] == ')' || expression[i] == '}' || expression[i] == ']') {
                     number_status = 0;
                     terms.push_back(new Number(stod(n)));
-                    terms.push_back(new Close_Bracket);
+                    terms.push_back(new Close_Bracket(expression[i]));
                     n.clear();
                 }
                 if (expression[i] == '+' || expression[i] == '-' || expression[i] == '*' || expression[i] == '/') {
@@ -280,8 +280,6 @@ public:
                     terms.push_back(new Operation(expression[i]));
                     n.clear();
                 }
-                if (expression[i] == '(' || expression[i] == '{' || expression[i] == '[')
-                    throw invalid_argument("Неверный синтаксис"); //Ошибка синтаксиса 
             }
         }
         if(number_status)           //Если осталось накопленное число, добавляем
@@ -319,6 +317,10 @@ public:
                 break;
             }
         }
+        if (terms[terms.size() - 1]->get_type() == operation)
+            return 0;
+        if (terms[terms.size() - 1]->get_type() == open_bracket)
+            return 0;
         return true;
     };
     bool checking_brackets() const{             //Проверка скобок
@@ -381,31 +383,31 @@ public:
             stack.pop();
         }
     };
-    double computing() {            //Вычисление выражения 
-        Mstack<Term*> stack;        //Стек для хранения лексем
-        double left_op, right_op;   //Левый и правый операнды
+    double computing() {                //Вычисление выражения 
+        Mstack<double> stack;           //Стек для хранения лексем
+        double left_op, right_op;       //Левый и правый операнды
         for (size_t i = 0; i < sort_terms.size(); i++) {
             if (sort_terms[i]->get_type() == numbers)
-                stack.push(sort_terms[i]);
+                stack.push(((Number*)sort_terms[i])->get_value());
             if (sort_terms[i]->get_type() == operation) {
-                right_op = ((Number*)(stack.top()))->get_value();
+                right_op = stack.top();
                 stack.pop();
-                left_op = ((Number*)(stack.top()))->get_value();
+                left_op = stack.top();
                 stack.pop();
                 if (((Operation*)sort_terms[i])->get_operation() == '+')
-                    stack.push(new Number(left_op + right_op));
+                    stack.push(left_op + right_op);
                 if (((Operation*)sort_terms[i])->get_operation() == '-')
-                    stack.push(new Number(left_op - right_op));
+                    stack.push(left_op - right_op);
                 if (((Operation*)sort_terms[i])->get_operation() == '*')
-                    stack.push(new Number(left_op * right_op));
+                    stack.push(left_op * right_op);
                 if (((Operation*)sort_terms[i])->get_operation() == '/')
                     if (right_op != 0)
-                        stack.push(new Number(left_op / right_op));
+                        stack.push(left_op / right_op);
                     else                    //Проверка деления на ноль
                         throw invalid_argument("Деление на ноль!");
             }
         }
-        return ((Number*)stack.top())->get_value(); //Возвращаем ответ
+        return stack.top();      //Возвращаем ответ
     };
 
 
@@ -417,9 +419,9 @@ public:
         return computing();
     };
     ~translator() {
-        size_t size_terms = terms.size();
-        for (size_t i = 0; i < size_terms; i++)
-            delete terms[i];
+        if (terms.size())
+            for (size_t i = 0; i < terms.size(); i++)
+                delete terms[i];
     };
 };
 

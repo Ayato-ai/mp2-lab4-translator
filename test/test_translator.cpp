@@ -6,10 +6,6 @@
 TEST(translator, can_translator) {
 	ASSERT_NO_THROW(translator t("1+5/(2-12)"));
 };
-TEST(translator, throw_lexical_analysis) {
-	translator t("1+2+3(");
-	ASSERT_ANY_THROW(t.lexical_analysis());
-};
 TEST(translator, analisys_is_false) {
 	translator t("1+2-/52");
 	t.lexical_analysis();

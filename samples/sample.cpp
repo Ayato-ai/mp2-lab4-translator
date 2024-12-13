@@ -4,7 +4,6 @@ using namespace std;
 
 int main() {
 	setlocale(2, "rus");
-	char g;
 	try {
 		string temp;
 
